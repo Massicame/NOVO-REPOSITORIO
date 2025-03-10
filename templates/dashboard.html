@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Dashboard</h2>
+    </div>
+    <div class="col text-end">
+        <a href="{{ url_for('novo_registro') }}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Novo Registro
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Nome da Marca</th>
+                <th>BI</th>
+                <th>NUIT</th>
+                <th>Nr. Caderneta</th>
+                <th>Contacto Principal</th>
+                <th>Contacto Alternativo</th>
+                <th>Data de Registro</th>
+                <th>Documentos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registro in registros %}
+            <tr>
+                <td>{{ registro.nome }}</td>
+                <td>{{ registro.nome_marca }}</td>
+                <td>{{ registro.bi }}</td>
+                <td>{{ registro.nuit }}</td>
+                <td>{{ registro.nr_caderneta }}</td>
+                <td>{{ registro.contacto1 }}</td>
+                <td>{{ registro.contacto2 or '-' }}</td>
+                <td>{{ registro.data_registro.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>
+                    <a href="{{ url_for('static', filename='uploads/' + registro.foto_path) }}" target="_blank" class="btn btn-sm btn-info">
+                        <i class="fas fa-image"></i> Foto
+                    </a>
+                    <a href="{{ url_for('static', filename='uploads/' + registro.documento_path) }}" target="_blank" class="btn btn-sm btn-info">
+                        <i class="fas fa-file"></i> Documento
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9" class="text-center">Nenhum registro encontrado</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

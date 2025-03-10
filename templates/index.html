@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-8 text-center">
+        <h1 class="display-4 mb-4">Bem-vindo ao Sistema de Registro de Marcas de Gado</h1>
+        <p class="lead mb-5">
+            Ministério da Agricultura, Ambiente e Pescas - Sistema de Gestão de Renovação de Marcas de Gado
+        </p>
+        {% if not current_user.is_authenticated %}
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+            <a href="{{ url_for('login') }}" class="btn btn-success btn-lg px-4 gap-3">Entrar</a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-success btn-lg px-4">Registrar</a>
+        </div>
+        {% else %}
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-success btn-lg px-4">Ir para Dashboard</a>
+            <a href="{{ url_for('novo_registro') }}" class="btn btn-outline-success btn-lg px-4">Novo Registro</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

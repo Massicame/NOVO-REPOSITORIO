@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Novo Registro de Marca de Gado</h2>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nome" class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" id="nome" name="nome" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="nome_marca" class="form-label">Nome da Marca</label>
+                            <input type="text" class="form-control" id="nome_marca" name="nome_marca" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="bi" class="form-label">BI</label>
+                            <input type="text" class="form-control" id="bi" name="bi" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="nuit" class="form-label">NUIT</label>
+                            <input type="text" class="form-control" id="nuit" name="nuit" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="nr_caderneta" class="form-label">Número da Caderneta</label>
+                            <input type="text" class="form-control" id="nr_caderneta" name="nr_caderneta" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="contacto1" class="form-label">Contacto Principal</label>
+                            <input type="tel" class="form-control" id="contacto1" name="contacto1" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contacto2" class="form-label">Contacto Alternativo</label>
+                            <input type="tel" class="form-control" id="contacto2" name="contacto2">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="foto" class="form-label">Foto da Marca</label>
+                            <input type="file" class="form-control" id="foto" name="foto" accept="image/*" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="documento" class="form-label">Documento</label>
+                            <input type="file" class="form-control" id="documento" name="documento" accept=".pdf,.doc,.docx" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">Salvar Registro</button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
