@@ -5,15 +5,33 @@
     <div class="col-md-6 col-lg-4">
         <div class="card shadow">
             <div class="card-body">
-                <h2 class="card-title text-center mb-4">Entrar</h2>
-                <form method="POST">
+                <h2 class="card-title text-center mb-4">Entrar no Sistema</h2>
+                
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" onsubmit="return validateForm()">
                     <div class="mb-3">
                         <label for="username" class="form-label">Nome de Usuário</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <input type="text" class="form-control" id="username" name="username" required minlength="3">
+                        <div class="invalid-feedback">
+                            Por favor, insira seu nome de usuário
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Senha</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                        <div class="invalid-feedback">
+                            Por favor, insira sua senha
+                        </div>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-success">Entrar</button>
@@ -26,4 +44,28 @@
         </div>
     </div>
 </div>
+
+<script>
+function validateForm() {
+    var username = document.getElementById('username');
+    var password = document.getElementById('password');
+    var isValid = true;
+
+    if (!username.value) {
+        username.classList.add('is-invalid');
+        isValid = false;
+    } else {
+        username.classList.remove('is-invalid');
+    }
+
+    if (!password.value) {
+        password.classList.add('is-invalid');
+        isValid = false;
+    } else {
+        password.classList.remove('is-invalid');
+    }
+
+    return isValid;
+}
+</script>
 {% endblock %} 

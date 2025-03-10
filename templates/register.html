@@ -5,22 +5,45 @@
     <div class="col-md-6 col-lg-4">
         <div class="card shadow">
             <div class="card-body">
-                <h2 class="card-title text-center mb-4">Registrar</h2>
-                <form method="POST">
+                <h2 class="card-title text-center mb-4">Criar Nova Conta</h2>
+                
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" onsubmit="return validateForm()">
                     <div class="mb-3">
                         <label for="username" class="form-label">Nome de Usuário</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <input type="text" class="form-control" id="username" name="username" required minlength="3">
+                        <div class="form-text">Mínimo de 3 caracteres</div>
+                        <div class="invalid-feedback">
+                            Por favor, escolha um nome de usuário válido
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">E-mail</label>
                         <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="invalid-feedback">
+                            Por favor, insira um e-mail válido
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Senha</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                        <div class="form-text">Mínimo de 6 caracteres</div>
+                        <div class="invalid-feedback">
+                            A senha deve ter pelo menos 6 caracteres
+                        </div>
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-success">Registrar</button>
+                        <button type="submit" class="btn btn-success">Criar Conta</button>
                     </div>
                 </form>
                 <div class="text-center mt-3">
@@ -30,4 +53,40 @@
         </div>
     </div>
 </div>
+
+<script>
+function validateForm() {
+    var username = document.getElementById('username');
+    var email = document.getElementById('email');
+    var password = document.getElementById('password');
+    var isValid = true;
+
+    // Validar username
+    if (!username.value || username.value.length < 3) {
+        username.classList.add('is-invalid');
+        isValid = false;
+    } else {
+        username.classList.remove('is-invalid');
+    }
+
+    // Validar email
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.value || !emailRegex.test(email.value)) {
+        email.classList.add('is-invalid');
+        isValid = false;
+    } else {
+        email.classList.remove('is-invalid');
+    }
+
+    // Validar senha
+    if (!password.value || password.value.length < 6) {
+        password.classList.add('is-invalid');
+        isValid = false;
+    } else {
+        password.classList.remove('is-invalid');
+    }
+
+    return isValid;
+}
+</script>
 {% endblock %} 
