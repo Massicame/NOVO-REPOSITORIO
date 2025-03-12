@@ -7,9 +7,13 @@ import os
 from datetime import datetime
 import logging
 import re
+import traceback
 
-# Configurar logging
-logging.basicConfig(level=logging.DEBUG)
+# Configurar logging mais detalhado
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -29,6 +33,7 @@ login_manager.login_message = 'Por favor, faça login para acessar esta página.
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'  # Especificando o nome da tabela
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -37,6 +42,7 @@ class User(UserMixin, db.Model):
     registrations = db.relationship('CattleBrand', backref='owner', lazy=True)
 
 class CattleBrand(db.Model):
+    __tablename__ = 'cattle_brands'  # Especificando o nome da tabela
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     nome_marca = db.Column(db.String(100), nullable=False)
@@ -48,7 +54,7 @@ class CattleBrand(db.Model):
     contacto1 = db.Column(db.String(20), nullable=False)
     contacto2 = db.Column(db.String(20))
     data_registro = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Atualizando a referência
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -98,54 +104,75 @@ def register():
         
     if request.method == 'POST':
         try:
+            logger.info("Iniciando processo de registro")
+            
+            # Obter dados do formulário
             username = request.form.get('username')
             email = request.form.get('email')
             password = request.form.get('password')
             
-            # Validações
+            logger.debug(f"Tentativa de registro para usuário: {username}, email: {email}")
+            
+            # Validações básicas
             if not username or not email or not password:
+                logger.warning("Campos obrigatórios não preenchidos")
                 flash('Por favor, preencha todos os campos')
                 return redirect(url_for('register'))
             
             # Validar formato do email
             if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                logger.warning(f"Email inválido: {email}")
                 flash('Por favor, insira um email válido')
                 return redirect(url_for('register'))
             
             # Validar tamanho da senha
             if len(password) < 6:
+                logger.warning("Senha muito curta")
                 flash('A senha deve ter pelo menos 6 caracteres')
                 return redirect(url_for('register'))
             
             # Verificar se usuário já existe
-            if User.query.filter_by(username=username).first():
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                logger.warning(f"Tentativa de criar usuário com nome já existente: {username}")
                 flash('Nome de usuário já existe')
                 return redirect(url_for('register'))
-                
+            
             # Verificar se email já existe
-            if User.query.filter_by(email=email).first():
+            existing_email = User.query.filter_by(email=email).first()
+            if existing_email:
+                logger.warning(f"Tentativa de criar usuário com email já existente: {email}")
                 flash('Email já está em uso')
                 return redirect(url_for('register'))
             
             # Criar novo usuário
-            user = User(
-                username=username,
-                email=email,
-                password_hash=generate_password_hash(password)
-            )
-            
-            db.session.add(user)
-            db.session.commit()
-            
-            logger.info(f"Novo usuário registrado: {username}")
-            flash('Conta criada com sucesso! Por favor, faça login.')
-            return redirect(url_for('login'))
+            try:
+                user = User(
+                    username=username,
+                    email=email,
+                    password_hash=generate_password_hash(password)
+                )
+                
+                db.session.add(user)
+                db.session.commit()
+                
+                logger.info(f"Novo usuário registrado com sucesso: {username}")
+                flash('Conta criada com sucesso! Por favor, faça login.')
+                return redirect(url_for('login'))
+                
+            except Exception as e:
+                db.session.rollback()
+                logger.error(f"Erro ao salvar usuário no banco de dados: {str(e)}")
+                logger.error(traceback.format_exc())
+                flash('Erro ao criar conta. Por favor, tente novamente.')
+                return redirect(url_for('register'))
             
         except Exception as e:
-            logger.error(f"Erro no registro: {str(e)}")
-            db.session.rollback()
-            flash('Erro ao criar conta. Por favor, tente novamente.')
-            
+            logger.error(f"Erro inesperado no registro: {str(e)}")
+            logger.error(traceback.format_exc())
+            flash('Erro inesperado. Por favor, tente novamente.')
+            return redirect(url_for('register'))
+    
     return render_template('register.html')
 
 @app.route('/dashboard')
@@ -242,4 +269,5 @@ if __name__ == '__main__':
             logger.info("Banco de dados inicializado com sucesso")
         except Exception as e:
             logger.error(f"Erro ao inicializar banco de dados: {str(e)}")
+            logger.error(traceback.format_exc())
     app.run(debug=True) 
